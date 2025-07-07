@@ -28,3 +28,6 @@ dist/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Claude development context (not for public repo)
+CLAUDE.md
