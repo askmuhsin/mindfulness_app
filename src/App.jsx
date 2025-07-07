@@ -55,6 +55,31 @@ const PurposeAnchorApp = () => {
     saveSessionsToStorage(sessions);
   }, [sessions]);
 
+  // Audio chime functionality
+  const playChime = () => {
+    try {
+      // Create a simple chime sound using Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Create a pleasant chime sound (bell-like)
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.5);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (error) {
+      console.error('Failed to play chime:', error);
+    }
+  };
+
   useEffect(() => {
     let interval = null;
     if (isActive && timeLeft > 0) {
@@ -63,6 +88,7 @@ const PurposeAnchorApp = () => {
           if (timeLeft <= 1) {
             setIsActive(false);
             setPhase('reflection');
+            playChime(); // Play chime when timer reaches 0
             return 0;
           }
           return timeLeft - 1;
