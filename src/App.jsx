@@ -2,6 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Clock, Target, Heart, Calendar, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PurposeAnchorApp = () => {
+  // LocalStorage key for sessions
+  const SESSIONS_STORAGE_KEY = 'purpose-anchor-sessions';
+
+  // LocalStorage utilities
+  const loadSessionsFromStorage = () => {
+    try {
+      const storedSessions = localStorage.getItem(SESSIONS_STORAGE_KEY);
+      return storedSessions ? JSON.parse(storedSessions) : [];
+    } catch (error) {
+      console.error('Failed to load sessions from localStorage:', error);
+      return [];
+    }
+  };
+
+  const saveSessionsToStorage = (sessions) => {
+    try {
+      localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+    } catch (error) {
+      console.error('Failed to save sessions to localStorage:', error);
+    }
+  };
+
   const [phase, setPhase] = useState('setup'); // setup, focus, reflection, history
   const [timeMinutes, setTimeMinutes] = useState(60);
   const [customTime, setCustomTime] = useState('');
@@ -13,7 +35,7 @@ const PurposeAnchorApp = () => {
   const [isActive, setIsActive] = useState(false);
   const [fulfilled, setFulfilled] = useState('');
   const [reflection, setReflection] = useState('');
-  const [sessions, setSessions] = useState([]);
+  const [sessions, setSessions] = useState(loadSessionsFromStorage);
   const [selectedDate, setSelectedDate] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
@@ -27,6 +49,11 @@ const PurposeAnchorApp = () => {
   const sessionTypes = [
     'Deep Work', 'Creative Flow', 'Analysis', 'Planning', 'Learning', 'Communication', 'Review', 'Other'
   ];
+
+  // Save sessions to localStorage whenever sessions change
+  useEffect(() => {
+    saveSessionsToStorage(sessions);
+  }, [sessions]);
 
   useEffect(() => {
     let interval = null;
